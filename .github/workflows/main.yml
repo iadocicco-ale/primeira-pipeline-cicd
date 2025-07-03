@@ -38,8 +38,9 @@ jobs:
 
       - name: Deploy com kubectl ignorando validação TLS e manifestos
         run: |
-          echo "${{ secrets.K8S_CONFIG }}" | tee kubeconfig
+          echo "${{ secrets.K8S_CONFIG }}" > kubeconfig
           export KUBECONFIG=$(pwd)/kubeconfig
           kubectl config view
           kubectl get nodes
-          kubectl --insecure-skip-tls-verify --validate=false apply -f ./k8s/deployment.yaml -n github
+          kubectl apply --insecure-skip-tls-verify --validate=false -f ./k8s/deployment.yaml -n github
+
