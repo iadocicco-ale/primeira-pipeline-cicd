@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: iadocicco/primeira-pipeline-cicd
+        image: iadocicco/primeira-pipeline
         ports:
         - containerPort: 5000
 --- 
