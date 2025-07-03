@@ -43,4 +43,3 @@ jobs:
           kubectl config view
           kubectl get nodes
           kubectl apply --insecure-skip-tls-verify --validate=false -f ./k8s/deployment.yaml -n github
-
