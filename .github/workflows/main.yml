@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
     inputs:
       namespace:
-        description: 'Namespace para deploy (somente manual)'
-        required: false
+        description: 'Namespace para deploy'
+        required: true
         default: 'github'
 
 jobs:
@@ -49,5 +49,4 @@ jobs:
             ./k8s/deployment.yaml
           images: |
             iadocicco/aula-primeira-pipeline:v${{ github.run_number }}
-          # Define o namespace dependendo do evento
-          namespace: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.namespace != '' && github.event.inputs.namespace || 'default' }}
+          namespace: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.namespace || 'github' }}
