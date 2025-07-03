@@ -1,43 +1,53 @@
 name: CI-CD
-on: 
+
+on:
   push:
     branches: ["main"]
   workflow_dispatch:
+    inputs:
+      namespace:
+        description: 'Namespace para deploy (somente manual)'
+        required: false
+        default: 'github'
+
 jobs:
   CI:
     runs-on: ubuntu-latest
     steps:
-    - name: Obtendo o código
-      uses: actions/checkout@v4.1.5
-    - name: Autenticação no Docker Hub
-      uses: docker/login-action@v3.1.0
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Build da Imagem Docker
-      uses: docker/build-push-action@v5.3.0
-      with:
-        context: ./src
-        file: ./src/Dockerfile
-        push: true
-        tags: | 
-          iadocicco/aula-primeira-pipeline:v${{ github.run_number }}
-          iadocicco/aula-primeira-pipeline:latest
+      - name: Obtendo o código
+        uses: actions/checkout@v4.1.5
+      - name: Autenticação no Docker Hub
+        uses: docker/login-action@v3.1.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build da Imagem Docker
+        uses: docker/build-push-action@v5.3.0
+        with:
+          context: ./src
+          file: ./src/Dockerfile
+          push: true
+          tags: |
+            iadocicco/aula-primeira-pipeline:v${{ github.run_number }}
+            iadocicco/aula-primeira-pipeline:latest
+
   CD:
     runs-on: ubuntu-latest
     needs: [CI]
-    steps: 
-    - name: Obtendo o código
-      uses: actions/checkout@v4.1.5
-    - name: Configuração de contexto do Kubernetes
-      uses: azure/k8s-set-context@v4.0.0
-      with:
-        method: kubeconfig
-        kubeconfig: ${{ secrets.K8S_CONFIG }}
-    - name: Execução do Manifesto
-      uses: Azure/k8s-deploy@v5
-      with:
-        manifests: |
-          ./k8s/deployment.yaml
-        images: |
-          iadocicco/aula-primeira-pipeline:v${{ github.run_number }}
+    steps:
+      - name: Obtendo o código
+        uses: actions/checkout@v4.1.5
+      - name: Configuração de contexto do Kubernetes
+        uses: azure/k8s-set-context@v4.0.0
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.K8S_CONFIG }}
+      - name: Execução do Manifesto
+        uses: Azure/k8s-deploy@v5
+        with:
+          manifests: |
+            ./k8s/deployment.yaml
+          images: |
+            iadocicco/aula-primeira-pipeline:v${{ github.run_number }}
+          # Define o namespace dependendo do evento
+          namespace: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.namespace != '' && github.event.inputs.namespace || 'default' }}
