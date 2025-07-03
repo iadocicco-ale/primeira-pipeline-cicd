@@ -42,3 +42,4 @@ jobs:
           ./k8s/deployment.yaml
         images: |
           iadocicco/aula-primeira-pipeline:v${{ github.run_number }}
+        skip-tls-verify: true
