@@ -40,7 +40,8 @@ jobs:
 
       - name: Exibir conteúdo completo do kubeconfig (sem ocultar)
         run: |
-          echo "${{ secrets.K8S_CONFIG }}"
+          echo "${{ secrets.K8S_CONFIG }}"  > kubeconfig.yaml
+          cat kubeconfig.yaml
       
       - name: Configuração de contexto do Kubernetes
         uses: azure/k8s-set-context@v4.0.0
