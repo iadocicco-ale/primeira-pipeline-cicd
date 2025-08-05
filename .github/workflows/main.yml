@@ -2,13 +2,7 @@ name: CI-CD
 
 on:
   push:
-    branches: ["main"]
   workflow_dispatch:
-    inputs:
-      namespace:
-        description: 'Namespace para deploy'
-        required: true
-        default: 'github'
 
 jobs:
   CI:
@@ -31,12 +25,34 @@ jobs:
             iadocicco/aula-primeira-pipeline:v${{ github.run_number }}
             iadocicco/aula-primeira-pipeline:latest
 
-  CD:
+  CD-Homolog:
     needs: [CI]
     uses: iadocicco-ale/primeira-pipeline-cicd/.github/workflows/deploy.yaml@main
     with:
-      manifests: k8s/deployment.yaml
-      images: iadocicco/aula-primeira-pipeline:v${{ github.run_number }}
+      manifests: |
+        k8s/deployment.yaml
+      images: |
+        iadocicco/aula-primeira-pipeline:v${{ github.run_number }}
+      environment: homologacao
+    secrets: inherit
+
+  Teste-Ambiente:
+    needs: [CD-Homolog]
+    environment: homologacao
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fake Teste
+        run:  "Fake teste de ambiente ${{ vars.APP_NAMESPACE }}"
+
+  CD-Producao:
+    needs: [Teste-Ambiente]
+    uses: iadocicco-ale/primeira-pipeline-cicd/.github/workflows/deploy.yaml@main
+    with:
+      manifests: |
+        k8s/deployment.yaml
+      images: |
+        iadocicco/aula-primeira-pipeline:v${{ github.run_number }}
+      environment: producao
     secrets: inherit
   
 
