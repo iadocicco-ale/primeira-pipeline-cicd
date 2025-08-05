@@ -1,5 +1,4 @@
 name: CI-CD
-
 on:
   push:
   workflow_dispatch:
@@ -12,15 +11,11 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Build da Imagem Docker
-      uses: docker/build-push-action@v5.3.0
       with:
-        context: ./src
-        file: ./src/Dockerfile
         push: true
         tags: |
           iadocicco/aula-primeira-pipeline:v${{ github.run_number }}
           iadocicco/aula-primeira-pipeline:latest
-
   CD-Homolog:
     needs: [CI]
     uses: iadocicco-ale/primeira-pipeline-cicd/.github/workflows/deploy.yaml@main
