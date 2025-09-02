@@ -19,6 +19,10 @@ jobs:
       runs-on: ubuntu-latest
       environment: ${{ inputs.environment }}
       steps:
+        - name: Adicionando logs
+          run: |
+            echo "::debug:: Mensagem de Log Debug"
+
         - name: Obtendo o código
           uses: actions/checkout@v4.1.5
         - name: Configuração de contexto do Kubernetes
